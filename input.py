@@ -8,3 +8,11 @@
 #
 #
 #
+import os
+from index import Main
+
+print("Main entry point of program. For now i will make it terminal based input but the eventual goal is to have GUI.")
+location = input("Enter location of dataset relative to ChemResearch folder: ")
+allFiles=os.listdir(location)
+mainModule=Main(allFiles,location)
+mainModule.parseCrownEthers()

@@ -1,4 +1,5 @@
 import numpy as np
+from enum import Enum
 class Atom:
   def __init__(self, inputList,conversionMatrix,radii):
     
@@ -69,6 +70,30 @@ class Atom:
   
   def __hash__(self):
     return hash(tuple(self.positionVector))
+  
+  def isBounded(self,other,dist=0,fudge=0.5):
+    if(dist==0):
+      dist=self.getDistance(other)
+    if(self.covalentRadius==0 or other.covalentRadius==0):
+      return False
+    
+    bondEquality=[dist<=(self.covalentRadius[i]+other.covalentRadius[i]+fudge) for i in range(2)]
+    return True in bondEquality
+
+
+
+class BondType(Enum):
+  SINGLE=1
+  DOUBLE=2
+  TRIPLE=3
+
+
+class Bond:
+  def __init__(self,type):
+    self.bondType=type
+  
+
+  
   
 
 

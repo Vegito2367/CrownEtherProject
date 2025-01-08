@@ -1,9 +1,10 @@
 #Each compound will have it own graph, encompassing the entire chem structure
 #Each atom will be a node with parent attribute.
 class Molecule:
-  def __init__(self,root):
+  def __init__(self,root,parser):
     self.structure={}
     self.structure[root]=[]
+    self.parser=parser
   
     
   

@@ -2,30 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from atom import Atom
 import os
+from collections import deque
 '''
 Need all possible covalent Radii to account for all new atoms, need to put the graph into this class because I need to access the getAtoms
 in a radius function.
 '''
-class CIFParser:
+class Molecule:
   @staticmethod
   def printNicely(myList):
-    output=""
     for j in myList:
       print(j)
 
   
 
   def __init__(self,filePath):
-    self.covalentRadii={#Did not put nitrogen covalent radius  
-  "Cu":1.32,
-  "Ag":1.45,
-  "Au":1.36,
-  "Pt":1.36,
-  "Pd":1.39,
-  "Hg":1.32,
-  "Fe":1.52,
-  "Ru":1.46
-}
+    self.covalentRadii={#Did not put nitrogen covalent radius 
+    "C":[0.75,0.67,0.60],
+    "O":[0.63,0.57,0.53]
+  }
     
     myfile=open(filePath,'r')
     self.fileName=myfile.name
@@ -76,7 +70,6 @@ class CIFParser:
     
     textofInterest=alllines[startIndex:alllines.index("#END")]
 
-    
     astarnum=self.alphaStarNumerator()
     astardenom=self.alphaStarDenominator()
 
@@ -96,6 +89,59 @@ class CIFParser:
     for j in textofInterest:
       self.Atoms.append(Atom(j.split(" "),self.ConversionMatrix,self.covalentRadii))
 
+    self.makeGraph()
+
+  def makeGraph(self):
+    self.structure={}
+    root=None
+    for j in self.Atoms:
+      if(j.symbol == "O"):
+        root=j
+        self.structure[j]=[]
+        break
+    #First lets make structure, then think of bfs to recognize cycles.
+    bfsQ=deque()
+    bfsQ.append(root)
+    visited=set()
+    parent=None
+    while bfsQ:
+      current=bfsQ.popleft()
+      visited.add(current)
+      surround=self.getAtomsInARadius(current,2)
+      self.structure[current]=[]
+      for atom,dist in surround:
+        if atom not in visited:
+          if(current.isBounded(atom,dist)):
+            self.addBond(current,atom)
+            bfsQ.append(atom)
+        else:
+          pass
+
+
+  def getStructure(self):
+    return self.structure
+
+
+    
+
+    
+  
+
+  
+  def addBond(self,existingAtom,newAtom):
+    self.structure[existingAtom].append(newAtom)
+    if(newAtom not in self.structure):
+      self.structure[newAtom]=[]
+    self.structure[newAtom].append(existingAtom)
+  
+  def returnAtoms(self,symbol):
+    output=[]
+    keyList=list(self.structure.keys())
+    for key in keyList:
+      if(key.symbol==symbol):
+        output.append(key)
+    return output
+  
   def getElementAtoms(self,symbol):
     output=[]
     for j in range(len(self.Atoms)):
@@ -104,9 +150,12 @@ class CIFParser:
 
     return output
   
+
   def containsAtom(self,symbol):
     atoms=self.getElementAtoms(symbol)
     return len(atoms)>0
+  
+
   def getAtomsInARadius(self,targetAtom,radius):
     output=[]
     for atom in self.Atoms:
