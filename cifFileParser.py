@@ -16,10 +16,15 @@ class Molecule:
   
 
   def __init__(self,filePath):
-    self.covalentRadii={#Did not put nitrogen covalent radius 
+    self.covalentRadii={#Did not put nitrogen covalent radius
+    "H":[0.32,0,0], 
     "C":[0.75,0.67,0.60],
-    "O":[0.63,0.57,0.53]
+    "N":[0.71,0.60,0.54],
+    "O":[0.63,0.57,0.53],
+    "K":[1.96,1.93,0],
+    
   }
+    self.structure={}
     
     myfile=open(filePath,'r')
     self.fileName=myfile.name
@@ -92,7 +97,7 @@ class Molecule:
     self.makeGraph()
 
   def makeGraph(self):
-    self.structure={}
+    searchRadius=5
     root=None
     for j in self.Atoms:
       if(j.symbol == "O"):
@@ -106,33 +111,24 @@ class Molecule:
     parent=None
     while bfsQ:
       current=bfsQ.popleft()
-      visited.add(current)
-      surround=self.getAtomsInARadius(current,2)
-      self.structure[current]=[]
-      for atom,dist in surround:
-        if atom not in visited:
-          if(current.isBounded(atom,dist)):
-            self.addBond(current,atom)
-            bfsQ.append(atom)
-        else:
-          pass
+      if(current not in visited):
+        visited.add(current)
+        surround=self.getAtomsInARadius(current,searchRadius)
+        if(current not in self.structure):
+          self.structure[current]=[]
+        for atom,dist in surround:
+          if(atom not in visited):
+            if(current.isBounded(atom,dist)):
+              if(atom not in self.structure):
+                self.structure[atom]=[]
+              self.structure[current].append(atom)
+              self.structure[atom].append(current)
+              bfsQ.append(atom)
+
 
 
   def getStructure(self):
     return self.structure
-
-
-    
-
-    
-  
-
-  
-  def addBond(self,existingAtom,newAtom):
-    self.structure[existingAtom].append(newAtom)
-    if(newAtom not in self.structure):
-      self.structure[newAtom]=[]
-    self.structure[newAtom].append(existingAtom)
   
   def returnAtoms(self,symbol):
     output=[]
@@ -160,7 +156,7 @@ class Molecule:
     output=[]
     for atom in self.Atoms:
       dist=atom.getDistance(targetAtom)
-      if(dist<=radius):
+      if(dist<=radius and dist!=0):
         output.append([atom,dist])
     return output
   

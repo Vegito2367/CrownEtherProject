@@ -3,7 +3,7 @@ from enum import Enum
 class Atom:
   def __init__(self, inputList,conversionMatrix,radii):
     
-    self.covalentRadius=0
+    self.covalentRadius=[0,0,0]
     elemname=inputList.pop(0)
     self.identifier=elemname
     ind1,ind2=0,0
@@ -71,15 +71,20 @@ class Atom:
   def __hash__(self):
     return hash(tuple(self.positionVector))
   
-  def isBounded(self,other,dist=0,fudge=0.5):
-    if(dist==0):
-      dist=self.getDistance(other)
-    if(self.covalentRadius==0 or other.covalentRadius==0):
-      return False
-    
-    bondEquality=[dist<=(self.covalentRadius[i]+other.covalentRadius[i]+fudge) for i in range(2)]
-    return True in bondEquality
-
+  def isBounded(self,other,dist=0,fudge=0.35):
+    try:
+      if(dist==0):
+        dist=self.getDistance(other)
+      
+      bondEquality = []
+      for i in range(3):
+        out=dist <= (self.covalentRadius[i] + other.covalentRadius[i] + fudge)
+        bondEquality.append(out)
+        print(self,other,dist,self.covalentRadius[i],other.covalentRadius[i],"-----------" if out else "")
+      return True in bondEquality
+    except TypeError:
+      print(self,other)
+      raise TypeError
 
 
 class BondType(Enum):

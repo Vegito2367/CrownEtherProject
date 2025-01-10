@@ -1,7 +1,6 @@
 from cifFileParser import Molecule
 import os
 import numpy as np
-from render import Render,ExportUnit
 from heatmap import InteractivePlot
 import pandas as pd
 from collections import Counter
@@ -21,7 +20,7 @@ class Main:
     #BFS/DFS
     for file in self.files:
       molecule=Molecule(self.folder+"/"+file)
-      print(molecule.structure)
+      open(f"{molecule.fileName}.txt","w").write(str(molecule.getStructure()))
 
 
 
