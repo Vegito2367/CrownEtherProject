@@ -71,17 +71,13 @@ class Atom:
   def __hash__(self):
     return hash(tuple(self.positionVector))
   
-  def isBounded(self,other,dist=0,fudge=0.35):
+  def isBounded(self,other,dist=0,fudge=1):
     try:
       if(dist==0):
         dist=self.getDistance(other)
       
-      bondEquality = []
-      for i in range(3):
-        out=dist <= (self.covalentRadius[i] + other.covalentRadius[i] + fudge)
-        bondEquality.append(out)
-        print(self,other,dist,self.covalentRadius[i],other.covalentRadius[i],"-----------" if out else "")
-      return True in bondEquality
+      out=dist <= (self.covalentRadius + other.covalentRadius + fudge)
+      return out
     except TypeError:
       print(self,other)
       raise TypeError

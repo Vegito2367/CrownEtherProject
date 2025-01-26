@@ -17,11 +17,12 @@ class Molecule:
 
   def __init__(self,filePath):
     self.covalentRadii={#Did not put nitrogen covalent radius
-    "H":[0.32,0,0], 
-    "C":[0.75,0.67,0.60],
-    "N":[0.71,0.60,0.54],
-    "O":[0.63,0.57,0.53],
-    "K":[1.96,1.93,0],
+    "H":0.32, 
+    "C":0.75,
+    "N":0.71,
+    "O":0.63,
+    "P":1.11,
+    "K":1.96,
     
   }
     self.structure={}
