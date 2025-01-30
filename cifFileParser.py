@@ -98,6 +98,9 @@ class Molecule:
     self.makeGraph()
 
   def makeGraph(self):
+    """
+    Generates the graph of the molecule using a modified BFS approach
+    """
     searchRadius=5
     root=None
     for j in self.Atoms:
@@ -126,12 +129,20 @@ class Molecule:
               self.structure[atom].append(current)
               bfsQ.append(atom)
 
+  
+  def detectCrownEthers(self):
+    allOxygens = self.getElementAtoms("O")
+    
+
 
 
   def getStructure(self):
     return self.structure
   
   def returnAtoms(self,symbol):
+    """
+    Returns all the atoms of the element 'symbol' in the molecule but by traversing the graph
+    """
     output=[]
     keyList=list(self.structure.keys())
     for key in keyList:
@@ -140,6 +151,9 @@ class Molecule:
     return output
   
   def getElementAtoms(self,symbol):
+    """
+    Returns all the atoms of the element 'symbol' in the molecule
+    """
     output=[]
     for j in range(len(self.Atoms)):
       if(self.Atoms[j].symbol == symbol):
