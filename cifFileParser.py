@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from atom import Atom
 import os
 from collections import deque
+from graph import Node
 '''
 Need all possible covalent Radii to account for all new atoms, need to put the graph into this class because I need to access the getAtoms
 in a radius function.
@@ -112,7 +113,6 @@ class Molecule:
     bfsQ=deque()
     bfsQ.append(root)
     visited=set()
-    parent=None
     while bfsQ:
       current=bfsQ.popleft()
       if(current not in visited):
@@ -131,7 +131,32 @@ class Molecule:
 
   
   def detectCrownEthers(self):
+    '''
+    Segmented BFS approach 
+    '''
     allOxygens = self.getElementAtoms("O")
+    visitedOxygens=set()
+    for oxygen in allOxygens:
+      if(oxygen not in visitedOxygens):
+        parent=None
+        queue=deque()
+
+        queue.append(Node(oxygen))
+        visited=set()
+        while(queue):
+          current = queue.popleft()
+          if(current not in visited):
+            visited.add(current)
+            if(current.symbol == "O"):
+              visitedOxygens.add(current)
+            adjacent = self.structure[current]
+            for atom in adjacent:
+              queue.append(atom)
+          else:
+
+            
+
+
     
 
 

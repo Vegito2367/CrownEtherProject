@@ -22,3 +22,10 @@ class Molecule:
       if(key.symbol==symbol):
         output.append(key)
     return output
+  
+
+
+class Node:
+  def __init__(self,atom,parent=None):
+    self.atom=atom
+    self.parent=parent
