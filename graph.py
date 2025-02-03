@@ -29,3 +29,13 @@ class Node:
   def __init__(self,atom,parent=None):
     self.atom=atom
     self.parent=parent
+
+  def __hash__(self):
+    return hash(self.atom)
+
+
+class CrownEther:
+  def __init__(self, crownAtoms):
+    pass
+
+  

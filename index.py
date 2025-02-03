@@ -17,10 +17,13 @@ class Main:
     return mag**0.5
 
   def parseCrownEthers(self):
-    #BFS/DFS
+    #BFS
     for file in self.files:
       molecule=Molecule(self.folder+"/"+file)
-      open(f"{molecule.fileName}.txt","w").write(str(molecule.getStructure()))
+      if( not molecule.validFile):
+        continue
+      open(f"{molecule.fileName}","w").write(str(molecule.getStructure()))
+      open(f"{molecule.fileName[0:6]}-Crowns.txt","w").write(str(molecule.detectCrownEthers()))
 
 
 

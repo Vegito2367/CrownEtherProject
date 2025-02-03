@@ -4,6 +4,7 @@ from atom import Atom
 import os
 from collections import deque
 from graph import Node
+from graph import CrownEther
 '''
 Need all possible covalent Radii to account for all new atoms, need to put the graph into this class because I need to access the getAtoms
 in a radius function.
@@ -35,6 +36,7 @@ class Molecule:
     try:
       startIndex=alllines.index("_atom_site_fract_z")+1
     except:
+      print("Invalid File",filePath)
       self.validFile=False
       return
     self.cellvalues={}
@@ -132,27 +134,36 @@ class Molecule:
   
   def detectCrownEthers(self):
     '''
-    Segmented BFS approach 
+    Attempts to detect crowns with the segmented BFS approach 
     '''
+    cycles={}
     allOxygens = self.getElementAtoms("O")
     visitedOxygens=set()
     for oxygen in allOxygens:
       if(oxygen not in visitedOxygens):
-        parent=None
         queue=deque()
 
-        queue.append(Node(oxygen))
+        queue.append(Node(oxygen,None))
         visited=set()
         while(queue):
-          current = queue.popleft()
-          if(current not in visited):
-            visited.add(current)
-            if(current.symbol == "O"):
-              visitedOxygens.add(current)
-            adjacent = self.structure[current]
+          currentNode = queue.popleft()
+          if(currentNode.atom not in visited):
+            visited.add(currentNode.atom)
+            if(currentNode.atom.symbol == "O"):
+              visitedOxygens.add(currentNode.atom)
+            adjacent = self.structure[currentNode.atom]
             for atom in adjacent:
-              queue.append(atom)
+              queue.append(Node(atom,currentNode))
           else:
+            #Cycle Detected
+            cycle=[]
+            while (currentNode != None):
+              cycle.append(currentNode.atom)
+              currentNode = currentNode.parent
+            
+            cycles[oxygen]=cycle
+            #Lets assume more than one cycle per oxygen search
+    return cycles
 
             
 
