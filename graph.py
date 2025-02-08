@@ -33,6 +33,12 @@ class Node:
   def __hash__(self):
     return hash(self.atom)
 
+  def __str__(self):
+    return f"{self.atom.identifier} - {self.parent.atom}"
+  
+  def __repr__(self):
+    return f"{self.atom.identifier} - {self.parent.atom}"
+
 
 class CrownEther:
   def __init__(self, crownAtoms):

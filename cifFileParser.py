@@ -105,31 +105,33 @@ class Molecule:
     Generates the graph of the molecule using a modified BFS approach
     """
     searchRadius=5
-    root=None
-    for j in self.Atoms:
-      if(j.symbol == "O"):
-        root=j
-        self.structure[j]=[]
-        break
+    alloxygens=self.getElementAtoms("O")
+    visitedOxygens=set()
+    
     #First lets make structure, then think of bfs to recognize cycles.
-    bfsQ=deque()
-    bfsQ.append(root)
-    visited=set()
-    while bfsQ:
-      current=bfsQ.popleft()
-      if(current not in visited):
-        visited.add(current)
-        surround=self.getAtomsInARadius(current,searchRadius)
-        if(current not in self.structure):
-          self.structure[current]=[]
-        for atom,dist in surround:
-          if(atom not in visited):
-            if(current.isBounded(atom,dist)):
-              if(atom not in self.structure):
-                self.structure[atom]=[]
-              self.structure[current].append(atom)
-              self.structure[atom].append(current)
-              bfsQ.append(atom)
+    for oxygen in alloxygens:
+      if(oxygen in visitedOxygens):
+        continue
+      bfsQ=deque()
+      bfsQ.append(oxygen)
+      visited=set()
+      while bfsQ:
+        current=bfsQ.popleft()
+        if(current not in visited):
+          visited.add(current)
+          if(current.symbol=="O"):
+            visitedOxygens.add(current)
+          surround=self.getAtomsInARadius(current,searchRadius)
+          if(current not in self.structure):
+            self.structure[current]=[]
+          for atom,dist in surround:
+            if(atom not in visited):
+              if(current.isBounded(atom,dist)):
+                if(atom not in self.structure):
+                  self.structure[atom]=[]
+                self.structure[current].append(atom)
+                self.structure[atom].append(current)
+                bfsQ.append(atom)
 
   
   def detectCrownEthers(self):
@@ -140,6 +142,7 @@ class Molecule:
     allOxygens = self.getElementAtoms("O")
     visitedOxygens=set()
     for oxygen in allOxygens:
+      cycles[oxygen]=[]
       if(oxygen not in visitedOxygens):
         queue=deque()
 
@@ -147,22 +150,29 @@ class Molecule:
         visited=set()
         while(queue):
           currentNode = queue.popleft()
+          parent = currentNode.parent if currentNode.parent != None else Node(None,None)
           if(currentNode.atom not in visited):
             visited.add(currentNode.atom)
             if(currentNode.atom.symbol == "O"):
               visitedOxygens.add(currentNode.atom)
             adjacent = self.structure[currentNode.atom]
             for atom in adjacent:
+              if(atom==parent.atom):
+                continue
               queue.append(Node(atom,currentNode))
+            
           else:
             #Cycle Detected
+            if(oxygen not in self.structure[currentNode.atom]):
+              continue
             cycle=[]
             while (currentNode != None):
               cycle.append(currentNode.atom)
               currentNode = currentNode.parent
             
-            cycles[oxygen]=cycle
+            cycles[oxygen].append(cycle)
             #Lets assume more than one cycle per oxygen search
+          
     return cycles
 
             

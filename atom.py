@@ -60,6 +60,8 @@ class Atom:
     return round(output**0.5,3)
   
   def __eq__(self, other):
+    if(other is None):
+      return False
     for i in range(3):
       if(self.positionVector[i]!=other.positionVector[i]):
         return False
@@ -71,7 +73,7 @@ class Atom:
   def __hash__(self):
     return hash(tuple(self.positionVector))
   
-  def isBounded(self,other,dist=0,fudge=1):
+  def isBounded(self,other,dist=0,fudge=0.5):
     try:
       if(dist==0):
         dist=self.getDistance(other)

@@ -22,8 +22,22 @@ class Main:
       molecule=Molecule(self.folder+"/"+file)
       if( not molecule.validFile):
         continue
-      open(f"{molecule.fileName}","w").write(str(molecule.getStructure()))
-      open(f"{molecule.fileName[0:6]}-Crowns.txt","w").write(str(molecule.detectCrownEthers()))
+      structure=molecule.getStructure()
+      outfile = open(f"CEResults/{file[0:6]}-Structure.txt","w")
+      outString=""
+      for key in structure:
+        outString+=f"{key} - {structure[key]}\n"
+      outfile.write(outString)
+      outfile.close()
+
+      cycleResults=molecule.detectCrownEthers()
+      outfile = open(f"CEResults/{file[0:6]}-Crowns.txt","w")
+      outString=""
+      for key in cycleResults:
+        outString+=f"{key} - {cycleResults[key]}\n"
+      outfile.write(outString)
+      outfile.close()
+      
 
 
 
