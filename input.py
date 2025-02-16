@@ -16,3 +16,5 @@ location = input("Enter location of dataset relative to ChemResearch folder: ")
 allFiles=os.listdir(location)
 mainModule=Main(allFiles,location)
 mainModule.parseCrownEthers()
+print("Analysis complete. Check CEResults folder for results.")
+

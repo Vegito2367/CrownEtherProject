@@ -28,6 +28,7 @@ class Molecule:
     
   }
     self.structure={}
+    self.oxygenCarbons={}
     
     myfile=open(filePath,'r')
     self.fileName=myfile.name
@@ -102,7 +103,9 @@ class Molecule:
 
   def makeGraph(self):
     """
-    Generates the graph of the molecule using a modified BFS approach
+    Generates two graphs of the molecule using a modified BFS approach
+    1. A graph of all the atoms in the molecule
+    2. A graph of all the oxygen carbon bonds in the molecule
     """
     searchRadius=5
     alloxygens=self.getElementAtoms("O")
@@ -124,11 +127,19 @@ class Molecule:
           surround=self.getAtomsInARadius(current,searchRadius)
           if(current not in self.structure):
             self.structure[current]=[]
+          if(current.symbol=="O" or current.symbol=="C") and current not in self.oxygenCarbons:
+            self.oxygenCarbons[current]=[]
           for atom,dist in surround:
             if(atom not in visited):
               if(current.isBounded(atom,dist)):
                 if(atom not in self.structure):
                   self.structure[atom]=[]
+                if(atom.symbol=="O" or atom.symbol=="C") and (current.symbol=="O" or current.symbol=="C"):
+                  if atom not in self.oxygenCarbons:
+                    self.oxygenCarbons[atom]=[]
+                  self.oxygenCarbons[current].append(atom)
+                  self.oxygenCarbons[atom].append(current)
+                
                 self.structure[current].append(atom)
                 self.structure[atom].append(current)
                 bfsQ.append(atom)
@@ -136,44 +147,51 @@ class Molecule:
   
   def detectCrownEthers(self):
     '''
-    Attempts to detect crowns with the segmented BFS approach 
+    Attempts to detect crowns with the segmented DFS approach
+    Only look for C-O bonds to remove unnecessary clutter
     '''
+    pass
     cycles={}
     allOxygens = self.getElementAtoms("O")
     visitedOxygens=set()
     for oxygen in allOxygens:
       cycles[oxygen]=[]
-      if(oxygen not in visitedOxygens):
-        queue=deque()
-
-        queue.append(Node(oxygen,None))
-        visited=set()
-        while(queue):
-          currentNode = queue.popleft()
-          parent = currentNode.parent if currentNode.parent != None else Node(None,None)
-          if(currentNode.atom not in visited):
-            visited.add(currentNode.atom)
-            if(currentNode.atom.symbol == "O"):
-              visitedOxygens.add(currentNode.atom)
-            adjacent = self.structure[currentNode.atom]
-            for atom in adjacent:
-              if(atom==parent.atom):
-                continue
-              queue.append(Node(atom,currentNode))
-            
-          else:
-            #Cycle Detected
-            if(oxygen not in self.structure[currentNode.atom]):
+      if(oxygen in visitedOxygens):
+        continue
+      stack=deque()
+      stack.append([oxygen,oxygen])
+      visited=set()
+      prev=None
+      while stack:
+        current,parent = stack[-1]
+        if(prev!=current):
+          prev=current
+        else:
+          break
+        if(current not in visited):
+          visited.add(current)
+          if(current.symbol=="O"):
+            visitedOxygens.add(current)
+          adjacent = self.oxygenCarbons[current]
+          for atom in adjacent:
+            if(atom == parent):
               continue
-            cycle=[]
-            while (currentNode != None):
-              cycle.append(currentNode.atom)
-              currentNode = currentNode.parent
-            
-            cycles[oxygen].append(cycle)
-            #Lets assume more than one cycle per oxygen search
+            stack.append([atom,current])
+        else:
+          current,par = stack.pop()
+          cycle=[current]
+          while (stack and stack[-1][0]!=current):
+            cycle.append(stack.pop()[0])
           
+          cycles[oxygen].append(cycle)
+
     return cycles
+  
+
+
+
+
+      
 
             
 
@@ -181,7 +199,8 @@ class Molecule:
     
 
 
-
+  def getOxygenCarbons(self):
+    return self.oxygenCarbons
   def getStructure(self):
     return self.structure
   
