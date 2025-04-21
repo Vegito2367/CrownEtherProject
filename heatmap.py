@@ -5,31 +5,31 @@ import pandas as pd
 class InteractivePlot:
   def __init__(self):
     pass
+  # @staticmethod
+  # def plotInteractivePlot(x,y,pointData, xlabel,ylabel,title):
+    
+  # ########################Angle vs Average Distance
+    
+  # #####################
+
+  #   df = pd.DataFrame({
+  #   xlabel: x,
+  #   ylabel: y,
+  #   "Data": pointData
+  #   })
+
+
+  #   fig = px.scatter(df, x=xlabel, y=ylabel, color=xlabel, hover_data=['Data'])
+  #   fig.update_layout(title=title,
+  #                 xaxis_title=xlabel,
+  #                 yaxis_title=ylabel)
+  #   fig.show()
+    
+  #   file = open(f"{title}.html","w")
+  #   fig.write_html(f"{title}.html")
+  #   file.close()
+
   @staticmethod
-  def plotInteractivePlot(x,y,pointData, xlabel,ylabel,title):
-    
-  ########################Angle vs Average Distance
-    
-  #####################
-
-    df = pd.DataFrame({
-    xlabel: x,
-    ylabel: y,
-    "Data": pointData
-    })
-
-
-    fig = px.scatter(df, x=xlabel, y=ylabel, color=xlabel, hover_data=['Data'])
-    fig.update_layout(title=title,
-                  xaxis_title=xlabel,
-                  yaxis_title=ylabel)
-    fig.show()
-    
-    file = open(f"{title}.html","w")
-    fig.write_html(f"{title}.html")
-    file.close()
-
-
   def plotInteractivePlotCaption(x,y,pointData,colorArray, xlabel,ylabel,title, makeFile,fileName, metal):
     
   ########################Angle vs Average Distance
@@ -73,6 +73,7 @@ class InteractivePlot:
       fig.write_html(f"{fileName}.html")
       file.close()
 
+  @staticmethod
   def plotInteractivePlot(x,y,pointData,colorArray, xlabel,ylabel,title, makeFile,fileName):
     
   ########################Angle vs Average Distance
