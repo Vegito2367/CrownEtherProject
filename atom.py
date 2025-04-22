@@ -1,5 +1,5 @@
 import numpy as np
-from enum import Enum
+
 from numpy.typing import NDArray
 
 
@@ -11,7 +11,7 @@ class Atom:
         radii: dict[str, float],
     ):
 
-        self.covalentRadius = [0, 0, 0]
+        self.covalentRadius = 0.0
         elemname = inputList.pop(0)
         self.identifier = elemname
         ind1, ind2 = 0, 0
@@ -50,7 +50,7 @@ class Atom:
         self.remainingNumbers = inputList
 
         if self.symbol in radii:
-            self.covalentRadius = radii[self.symbol]
+            self.covalentRadius: float = radii[self.symbol]
 
     def __str__(self):
         return self.identifier
@@ -82,7 +82,7 @@ class Atom:
     def __hash__(self):
         return hash(tuple(self.positionVector))
 
-    def isBounded(self, other, dist=0, fudge=0.5):
+    def isBounded(self, other: "Atom", dist: float = 0, fudge: float = 0.5):
         try:
             if dist == 0:
                 dist = self.getDistance(other)
@@ -94,12 +94,12 @@ class Atom:
             raise TypeError
 
 
-class BondType(Enum):
-    SINGLE = 1
-    DOUBLE = 2
-    TRIPLE = 3
+# class BondType(Enum):
+#     SINGLE = 1
+#     DOUBLE = 2
+#     TRIPLE = 3
 
 
-class Bond:
-    def __init__(self, type):
-        self.bondType = type
+# class Bond:
+#     def __init__(self, type):
+#         self.bondType = type

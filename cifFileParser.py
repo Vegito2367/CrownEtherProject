@@ -1,15 +1,21 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from atom import Atom
 from collections import deque
-from graph import CrownEther
+
 from numpy.typing import NDArray
+from typing import Deque
 
 
 """
 Need all possible covalent Radii to account for all new atoms, need to put the graph into this class because I need to access the getAtoms
 in a radius function.
 """
+
+type Structure = dict[Atom, list[Atom]]  # A dictionary of atoms and their neighbours
+type DFSStack = list[Atom]  # A stack of atoms for DFS
+type AtomDist = tuple[
+    Atom, float
+]  # A list of atoms and their distances from the target atom
 
 
 class Molecule:
@@ -19,7 +25,7 @@ class Molecule:
             print(j)
 
     def __init__(self, filePath: str):
-        self.covalentRadii = {  # Did not put nitrogen covalent radius
+        self.covalentRadii: dict[str, float] = {  # Did not put nitrogen covalent radius
             "H": 0.32,
             "C": 0.75,
             "N": 0.71,
@@ -27,8 +33,8 @@ class Molecule:
             "P": 1.11,
             "K": 1.96,
         }
-        self.structure = {}
-        self.oxygenCarbons = {}
+        self.structure: Structure = {}
+        self.oxygenCarbons: Structure = {}
 
         myfile = open(filePath, "r")
         self.fileName = myfile.name
@@ -117,7 +123,7 @@ class Molecule:
 
         self.makeGraph()
 
-    def makeGraph(self):
+    def makeGraph(self) -> None:
         """
         Generates two graphs of the molecule using a modified BFS approach
         1. A graph of all the atoms in the molecule
@@ -125,15 +131,15 @@ class Molecule:
         """
         searchRadius = 5
         alloxygens: list[Atom] = self.getElementAtoms("O")
-        visitedOxygens = set()
+        visitedOxygens: set[Atom] = set()
 
         # First lets make structure, then think of bfs to recognize cycles.
         for oxygen in alloxygens:
             if oxygen in visitedOxygens:
                 continue
-            bfsQ = deque()
+            bfsQ: Deque[Atom] = deque()
             bfsQ.append(oxygen)
-            visited = set()
+            visited: set[Atom] = set()
             while bfsQ:
                 current = bfsQ.popleft()
                 if current not in visited:
@@ -170,16 +176,16 @@ class Molecule:
         Only look for C-O bonds to remove unnecessary clutter
         """
         pass
-        cycles = {}
+        cycles: dict[Atom, list[list[Atom]]] = {}
         allOxygens = self.getElementAtoms("O")
-        visitedOxygens = set()
+        visitedOxygens: set[Atom] = set()
         for oxygen in allOxygens:
             cycles[oxygen] = []
             if oxygen in visitedOxygens:
                 continue
-            stack = deque()
+            stack: Deque[DFSStack] = deque()
             stack.append([oxygen, oxygen])
-            visited = set()
+            visited: set[Atom] = set()
             prev = None
             while stack:
                 current, parent = stack[-1]
@@ -197,7 +203,7 @@ class Molecule:
                             continue
                         stack.append([atom, current])
                 else:
-                    current, par = stack.pop()
+                    current, _ = stack.pop()
                     cycle = [current]
                     while stack and stack[-1][0] != current:
                         cycle.append(stack.pop()[0])
@@ -216,7 +222,7 @@ class Molecule:
         """
         Returns all the atoms of the element 'symbol' in the molecule but by traversing the graph
         """
-        output = []
+        output: list[Atom] = []
         keyList = list(self.structure.keys())
         for key in keyList:
             if key.symbol == symbol:
@@ -227,7 +233,7 @@ class Molecule:
         """
         Returns all the atoms of the element 'symbol' in the molecule
         """
-        output = []
+        output: list[Atom] = []
         for j in range(len(self.Atoms)):
             if self.Atoms[j].symbol == symbol:
                 output.append(self.Atoms[j])
@@ -241,15 +247,16 @@ class Molecule:
         atoms = self.getElementAtoms(symbol)
         return len(atoms) > 0
 
-    def getAtomsInARadius(self, targetAtom: Atom, radius: float) -> list[list[Atom]]:
+    def getAtomsInARadius(self, targetAtom: Atom, radius: float) -> list[AtomDist]:
         """
         Returns all the atoms in the molecule that are within a certain radius of the target atom
         """
-        output = []
+        output: list[AtomDist] = []
         for atom in self.Atoms:
             dist = atom.getDistance(targetAtom)
             if dist <= radius and dist != 0:
-                output.append([atom, dist])
+                output.append((atom, dist))
+
         return output
 
     def getParticularAtom(self, identifier: str) -> Atom | str:

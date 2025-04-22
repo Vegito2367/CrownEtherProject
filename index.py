@@ -4,7 +4,7 @@ from cifFileParser import Molecule
 class Main:
     # Main class to parse the CIF files and detect crown ethers
 
-    def __init__(self, allfiles: list, location: str):
+    def __init__(self, allfiles: list[str], location: str):
         self.files = allfiles
         self.folder = location
 

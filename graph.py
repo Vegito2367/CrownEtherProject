@@ -3,25 +3,25 @@
 from atom import Atom
 
 
-class Molecule:
-    def __init__(self, root, parser):
-        self.structure = {}
-        self.structure[root] = []
-        self.parser = parser
+# class Molecule:
+#     def __init__(self, root, parser):
+#         self.structure = {}
+#         self.structure[root] = []
+#         self.parser = parser
 
-    def addBond(self, existingAtom, newAtom):
-        self.structure[existingAtom].append(newAtom)
-        if newAtom not in self.structure:
-            self.structure[newAtom] = []
-        self.structure[newAtom].append(existingAtom)
+#     def addBond(self, existingAtom, newAtom):
+#         self.structure[existingAtom].append(newAtom)
+#         if newAtom not in self.structure:
+#             self.structure[newAtom] = []
+#         self.structure[newAtom].append(existingAtom)
 
-    def returnAtoms(self, symbol):
-        output = []
-        keyList = list(self.structure.keys())
-        for key in keyList:
-            if key.symbol == symbol:
-                output.append(key)
-        return output
+#     def returnAtoms(self, symbol):
+#         output = []
+#         keyList = list(self.structure.keys())
+#         for key in keyList:
+#             if key.symbol == symbol:
+#                 output.append(key)
+#         return output
 
 
 # class Node:
@@ -48,5 +48,5 @@ class Molecule:
 
 
 class CrownEther:
-    def __init__(self, crownAtoms):
+    def __init__(self, crownAtoms:list[Atom]):
         pass
